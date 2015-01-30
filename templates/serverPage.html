@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>serverPage</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $("button").click(function() {
+            $.get("http://127.0.0.1:5000/info", function(msg) {
+                
+            });
+        });
+    });
+    </script>
+</head>
+
+<body>
+    
+    <center>
+        <h1 id= 'msg'></h1>
+        <button>Click</button>
+    </center>
+    
+</body>
+
+</html>
