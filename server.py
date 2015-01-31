@@ -10,9 +10,9 @@ app = Flask(__name__)
 import requests
 
 q = Queue()
-resRouter = 'http://127.0.0.1:5000/response'
-router = 'http://127.0.0.1:5000/register'
-moreWork = 'http://127.0.0.1:5000/moreWork'
+resRouter = 'http://192.168.1.122:5000/response'
+router = 'http://192.168.1.122:5000/register'
+moreWork = 'http://192.168.1.122:5000/moreWork'
 
 @app.route('/sendwork', methods= ['GET', 'POST'])
 def sendwork():

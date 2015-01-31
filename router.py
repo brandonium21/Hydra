@@ -139,4 +139,4 @@ if __name__ == '__main__':
     workToWorkPath = manager.dict()
     p = Process(target=dispatchLoop)
     p.start()
-    app.run(port= 5000)
+    app.run(port= 5000, host = '192.168.1.122')
