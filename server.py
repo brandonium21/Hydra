@@ -4,12 +4,15 @@ from flask import redirect, render_template
 from flask import request, url_for
 import sys
 import os
+import subprocess
 from multiprocessing import Process, Queue
 app = Flask(__name__)
 import requests
 
 q = Queue()
 resRouter = 'http://127.0.0.1:5000/response'
+router = 'http://127.0.0.1:5000/register'
+moreWork = 'http://127.0.0.1:5000/moreWork'
 
 @app.route('/sendwork', methods= ['GET', 'POST'])
 def sendwork():
@@ -17,7 +20,6 @@ def sendwork():
         if routerMsg(request.form):
             task = request.form
             q.put(task)
-
 
         else:
             return "No Task"
@@ -31,20 +33,27 @@ def workLoop():
         if not q.empty():
             item = q.get()
             #print str(item)
-            os.system(
-                item['task']
+            result = subprocess.check_output([
+                item['task']], 
+                shell=True
                 )
+            results(result)
             r = requests.post(resRouter, data = item)
             print r.text
 
+#return results of work to the roter
+def results(result):
+    results = {'result': result}
+    r = requests.post(resRouter, data= results)
 
 #verify msg sent Back
 def routerMsg(task):
     return True if 'task' in task else False
 
+def done():
+    r = requests.post(moreWork, data= port)
 # SERVER
 def state():
-    router = 'http://127.0.0.1:5000/register'
     r = requests.post(router, data= port)
 
 
@@ -53,7 +62,6 @@ if __name__ == '__main__':
     p = Process(target=workLoop)
     p.start()
     
-    port = {'port':sys.argv[1],
-            'ip':'127.0.0.1'}
+    port = {'port':sys.argv[1]}
     state();
     app.run(port= int(sys.argv[1]))

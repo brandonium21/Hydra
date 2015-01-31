@@ -10,17 +10,33 @@ app = Flask(__name__)
 def hello_world():
     return 'Hello'
 
+
+@app.route('/moreWork', methods= ['GET', 'POST'])
+def ready():
+    if verifyRegister(request.form):
+        port = request.form['port']
+        ip = '192.168.1.101'
+        #request.remote_addr
+        url = 'http://' + ip +':' + port + '/sendwork'
+        worker_id = UrlToWorkerId[url]
+        worker_IdQueue.put(worker_id)
+    return ""
+
 #recieve request
 @app.route('/register', methods= ['GET', 'POST'])
 def register():
     global workerIdToUrl
     if verifyRegister(request.form):
-        worker = request.form
-        idWorker = newWorker(worker, Id())
+        port = request.form['port']
+        ip = request.remote_addr
+        url = 'http://' + ip +':' + port + '/sendwork'
+        worker_id = Id()
+        UrlToWorkerId[url] = worker_id
         # add worker + url to workerIdToUrl hashtable
-        workerIdToUrl[idWorker['id']] = idWorker['url'] 
-        worker_IdQueue.put(idWorker['id']) 
-        
+        workerIdToUrl[worker_id] = url
+        worker_IdQueue.put(worker_id) 
+
+        # url to Newworkerid
         #print str(workerIdToUrl)
     else:
         return "bad request"
@@ -29,21 +45,14 @@ def register():
 
 #verify Request 
 def verifyRegister(req):
-    return True if 'port' in req and 'ip' in req else False
+    return True if 'port' in req else False
 
 #verify Task
 def verifyTask(task):
     return True if 'task' in task else False
 
-
-# add worker to hash Table
-def newWorker(form, Id):
-    port = form['port']
-    ip = form['ip']
-    url = 'http://' + ip +':' + port + '/sendwork'
-    # url to Newworkerid
-    workForce = {'url': url , 'id': Id }
-    return workForce
+def verifyResults(results):
+    return True if 'result' in results else False
 
 # generate id 
 def Id():
@@ -72,8 +81,6 @@ def dispatchLoop():
                 r = requests.post(workerIdToUrl[worker_id] , data = workToWorkPath[work_id])
 
 
-
-
 # take in work and delegate work.
 @app.route('/work', methods= ['GET', 'POST'])
 def assignments():
@@ -90,10 +97,18 @@ def assignments():
 #recieve response
 @app.route('/response', methods= ['GET', 'POST'])
 def response():
-    print request.form
-    if request.form == True:
-        msg = request.form
-    return "got it"
+    #print request.form
+    worker = request.form 
+    if verifyResults(worker):
+        results = worker
+        port = worker['port']
+        ip = request.remote_addr
+        url = 'http://' + ip +':' + port + '/sendwork'
+        worker_id = UrlToWorkerId[url]
+        work_id = workerIdToWorkId[worker_id]
+        resultIdToResults[work_id] = results
+        print str(resultIdToResults[work_id])
+    return ""
 
 if __name__ == '__main__':
 
@@ -106,7 +121,11 @@ if __name__ == '__main__':
 
     # status Hash workId w/ status of work
     #status = {'id' : 'state'}
+    UrlToWorkerId = manager.dict()
 
+    resultIdToResults = manager.dict()
+    #WorkId to results
+    workIdToResults = manager.dict()
     # workId to workerList id's only infro from /register
     workIdToWorkerList = manager.dict()
 
