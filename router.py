@@ -15,8 +15,7 @@ def hello_world():
 def ready():
     if verifyRegister(request.form):
         port = request.form['port']
-        ip = '192.168.1.101'
-        #request.remote_addr
+        ip = request.remote_addr
         url = 'http://' + ip +':' + port + '/sendwork'
         worker_id = UrlToWorkerId[url]
         worker_IdQueue.put(worker_id)
