@@ -64,4 +64,4 @@ if __name__ == '__main__':
     
     port = {'port':sys.argv[1]}
     state();
-    app.run(host = '198.168.1.101' ,port= int(sys.argv[1]))
+    app.run(host = '192.168.1.101' ,port= int(sys.argv[1]))
