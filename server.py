@@ -39,6 +39,7 @@ def workLoop():
                 )
             results(result)
             r = requests.post(resRouter, data = item)
+            done()
             print r.text
 
 #return results of work to the roter
