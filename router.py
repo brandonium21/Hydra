@@ -13,12 +13,16 @@ def hello_world():
 
 @app.route('/moreWork', methods= ['GET', 'POST'])
 def ready():
+    print 'mW active'
     if verifyRegister(request.form):
         port = request.form['port']
         ip = request.remote_addr
         url = 'http://' + ip +':' + port + '/sendwork'
+        print 'got url ' + url 
         worker_id = UrlToWorkerId[url]
+        print 'got workerId '
         worker_IdQueue.put(worker_id)
+        print 'worker: ' + ip +':' + port + " Wants Work"
     return ""
 
 #recieve request
@@ -69,7 +73,7 @@ def dispatchLoop():
             work_id = workQueue.get()
             for i in range(3):
                 worker_id = worker_IdQueue.get()
-                print "got worker"
+                #print "got worker"
                 if work_id in workIdToWorkerList:
                     #if list is empty add initial worker
                     workIdToWorkerList[work_id] = workIdToWorkerList[work_id] + [worker_id, ]
@@ -78,7 +82,7 @@ def dispatchLoop():
                     # if list is populated add workers
                 
                 workerIdToWorkId[worker_id] = work_id
-                print workerIdToUrl[worker_id]
+                #print workerIdToUrl[worker_id]
 
                 r = requests.post(workerIdToUrl[worker_id] , data = workToWorkPath[work_id])
 
@@ -89,15 +93,14 @@ def assignments():
     print request.form
     print 'task' in request.form
     print verifyTask(request.form)
-    for i in range(6):
-        if verifyTask(request.form):
-            task = request.form 
-            workid = uuid.uuid4()
-            workToWorkPath[workid] = task
-            print workid
-            #task = {'msg':'working Now'}
-            workQueue.put(workid, block=False)
-            print str(task)
+    if verifyTask(request.form):
+        task = request.form 
+        workid = uuid.uuid4()
+        workToWorkPath[workid] = task
+        print workid
+        #task = {'msg':'working Now'}
+        workQueue.put(workid, block=False)
+        print workQueue
     return str(task)
 
 #recieve response
