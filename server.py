@@ -10,13 +10,13 @@ app = Flask(__name__)
 import requests
 
 q = Queue()
-resRouter = 'http://192.168.1.122:5000/response'
-router = 'http://192.168.1.122:5000/register'
-moreWork = 'http://192.168.1.122:5000/moreWork'
-
+host = 'localhost'
+resRouter = 'http://' + host + ':5000/response'
+router = 'http://' + host + ':5000/register'
+moreWork = 'http://' + host + ':5000/moreWork'
+port = 0
 @app.route('/sendwork', methods= ['GET', 'POST'])
 def sendwork():
-       
         if routerMsg(request.form):
             task = request.form
             q.put(task)
@@ -39,7 +39,7 @@ def workLoop():
                 )
             results(result)
             r = requests.post(resRouter, data = item)
-            done()
+            done();
             print r.text
 
 #return results of work to the roter
@@ -52,7 +52,7 @@ def routerMsg(task):
     return True if 'task' in task else False
 
 def done():
-    r = requests.post(moreWork, data= port)
+    m = requests.post(moreWork, data= port)
 # SERVER
 def state():
     r = requests.post(router, data= port)
@@ -65,4 +65,4 @@ if __name__ == '__main__':
     
     port = {'port':sys.argv[1]}
     state();
-    app.run(host = '192.168.1.101' ,port= int(sys.argv[1]))
+    app.run(host = host , port= int(sys.argv[1]))

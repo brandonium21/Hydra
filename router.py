@@ -33,6 +33,7 @@ def register():
         UrlToWorkerId[url] = worker_id
         # add worker + url to workerIdToUrl hashtable
         workerIdToUrl[worker_id] = url
+        time.sleep(1)
         worker_IdQueue.put(worker_id) 
 
         # url to Newworkerid
@@ -62,11 +63,13 @@ def dispatchLoop():
     import time
     while True:
         #print workerIdToUrl
-        time.sleep(.1)
+        time.sleep(1)
         if not workQueue.empty():
+            print 'work in'
             work_id = workQueue.get()
-            for i in xrange(3):
+            for i in range(3):
                 worker_id = worker_IdQueue.get()
+                print "got worker"
                 if work_id in workIdToWorkerList:
                     #if list is empty add initial worker
                     workIdToWorkerList[work_id] = workIdToWorkerList[work_id] + [worker_id, ]
@@ -75,22 +78,26 @@ def dispatchLoop():
                     # if list is populated add workers
                 
                 workerIdToWorkId[worker_id] = work_id
-                print workerIdToUrl
-                print work_id
+                print workerIdToUrl[worker_id]
+
                 r = requests.post(workerIdToUrl[worker_id] , data = workToWorkPath[work_id])
 
 
 # take in work and delegate work.
 @app.route('/work', methods= ['GET', 'POST'])
 def assignments():
-    if verifyTask(request.form):
-        task = request.form 
-        workid = uuid.uuid4()
-        workToWorkPath[workid] = task
-    #task = {'msg':'working Now'}
-        workQueue.put(workid)
-    #work()
-    #print str(task)
+    print request.form
+    print 'task' in request.form
+    print verifyTask(request.form)
+    for i in range(6):
+        if verifyTask(request.form):
+            task = request.form 
+            workid = uuid.uuid4()
+            workToWorkPath[workid] = task
+            print workid
+            #task = {'msg':'working Now'}
+            workQueue.put(workid, block=False)
+            print str(task)
     return str(task)
 
 #recieve response
@@ -106,7 +113,7 @@ def response():
         worker_id = UrlToWorkerId[url]
         work_id = workerIdToWorkId[worker_id]
         resultIdToResults[work_id] = results
-        print str(resultIdToResults[work_id])
+        #print str(resultIdToResults[work_id])
     return ""
 
 if __name__ == '__main__':
@@ -138,4 +145,4 @@ if __name__ == '__main__':
     workToWorkPath = manager.dict()
     p = Process(target=dispatchLoop)
     p.start()
-    app.run(port= 5000, host = '192.168.1.122')
+    app.run(port= 5000, host = 'localhost')
