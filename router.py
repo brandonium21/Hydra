@@ -1,7 +1,7 @@
 import sys
 from logging import warning, info , error, debug, critical, DEBUG, basicConfig
 import time
-basicConfig(stream=sys.stdout, level=DEBUG,  format = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
+basicConfig(stream=sys.stdout, level=DEBUG,  format = "[%(filename)s:%(lineno)s - %(funcName)1s() ] %(message)s")
 from flask import Flask, request
 import requests 
 import uuid
