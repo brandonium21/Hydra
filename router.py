@@ -1,4 +1,4 @@
-import sys
+import sys, os
 from logging import warning, info , error, debug, critical, DEBUG, basicConfig
 import time
 basicConfig(stream=sys.stdout, level=DEBUG,  format = "[%(filename)s:%(lineno)s - %(funcName)1s() ] %(message)s")
@@ -68,6 +68,7 @@ def Id():
 
 def dispatchLoop():
     import time
+    print os.environ
     while True:
         time.sleep(1)
         info(workQueue.empty())
@@ -106,15 +107,17 @@ def assignments():
 #recieve response
 @app.route('/response', methods= ['GET', 'POST'])
 def response():
-    worker = request.form 
-    if verifyResults(worker):
-        results = worker
-        port = worker['port']
+    worker = request.form
+    info("Result is %s " % request.form)
+    if verifyResults(request.form):
+        results = request.form['results']
+        port = request.form['port']
         ip = request.remote_addr
         url = 'http://' + ip +':' + port + '/sendwork'
         worker_id = UrlToWorkerId[url]
         work_id = workerIdToWorkId[worker_id]
         workerIdToResults[work_id] = results
+
     return ""
 
 if __name__ == '__main__':

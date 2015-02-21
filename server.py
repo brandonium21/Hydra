@@ -31,25 +31,22 @@ def sendwork():
         return "got it"
 
 def workLoop():
-
     while True:
         time.sleep(.1)
         if not q.empty():
             item = q.get()
-            #print str(item)
             result = subprocess.check_output([
                 item['task']], 
                 shell=True
                 )
+            info("Server result %s" % result)
             results(result)
-            r = requests.post(resRouter, data = item)
             done();
-            print r.text
 
 #return results of work to the roter
 def results(result):
     results = {'result': result}
-    r = requests.post(resRouter, data= results)
+    r = requests.post(resRouter, data=results)
 
 #verify msg sent Back
 def routerMsg(task):
@@ -57,10 +54,10 @@ def routerMsg(task):
 
 def done():
     info(blah)
-    m = requests.post(moreWork, data= blah)
+    m = requests.post(moreWork, data=blah)
 # SERVER
 def state():
-    r = requests.post(router, data= blah)
+    r = requests.post(router, data=blah)
 
 
 
