@@ -17,13 +17,16 @@ def hello_world():
 @app.route('/moreWork', methods= ['GET', 'POST'])
 def ready():
     info('more work wanted')
+    info(request.form)
     if verifyRegister(request.form):
         port = request.form['port']
         ip = request.remote_addr
         url = 'http://' + ip +':' + port + '/sendwork'
         
         worker_id = UrlToWorkerId[url]
+        info("Adding %s", worker_id)
         worker_IdQueue.put(worker_id)
+        info("is empty? %s" % worker_IdQueue.empty())
     return ""
 
 #recieve request
@@ -67,11 +70,17 @@ def dispatchLoop():
     import time
     while True:
         time.sleep(1)
+        info(workQueue.empty())
+        info(worker_IdQueue.empty())
         if not workQueue.empty():
             info('work IN')
             work_id = workQueue.get()
-            for i in range(3):
-                worker_id = worker_IdQueue.get()
+            worker_list = ()
+            while not worker_IdQueue.empty() and len(worker_list) != 3:
+                info('Size %s' % len(worker_list))
+                worker_list = worker_list + (worker_IdQueue.get(),)
+            for worker_id in worker_list:
+                info("assigned %s" % worker_id)
                 if work_id in workIdToWorkerList:
                     #if list is empty add initial worker
                     workIdToWorkerList[work_id] = workIdToWorkerList[work_id] + [worker_id, ]
