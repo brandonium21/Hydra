@@ -115,7 +115,7 @@ def response():
         worker_id = UrlToWorkerId[url]
         work_id = workerIdToWorkId[worker_id]
         resultIdToResults[work_id] = results
-        #print str(resultIdToResults[work_id])
+        print str(resultIdToResults[work_id])
     return ""
 
 if __name__ == '__main__':
