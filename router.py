@@ -96,6 +96,7 @@ def assignments():
 
 #recieve response
 @app.route('/response', methods= ['GET', 'POST'])
+def response():
     worker = request.form 
     if verifyResults(worker):
         results = worker
