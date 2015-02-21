@@ -1,4 +1,6 @@
-
+import sys
+from logging import warning, info , error, debug, critical, DEBUG, basicConfig
+basicConfig(stream=sys.stdout, level=DEBUG)
 from flask import Flask
 from flask import redirect, render_template
 from flask import request, url_for

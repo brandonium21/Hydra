@@ -1,3 +1,6 @@
+import sys
+from logging import warning, info , error, debug, critical, DEBUG, basicConfig
+basicConfig(stream=sys.stdout, level=DEBUG)
 from flask import Flask, request
 import requests 
 import uuid
@@ -12,16 +15,16 @@ def hello_world():
 
 @app.route('/moreWork', methods= ['GET', 'POST'])
 def ready():
-    print 'mW active'
+    info('more work wanted')
     if verifyRegister(request.form):
         port = request.form['port']
         ip = request.remote_addr
         url = 'http://' + ip +':' + port + '/sendwork'
-        print 'got url ' + url 
+        
         worker_id = UrlToWorkerId[url]
-        print 'got workerId '
+        #print 'got workerId '
         worker_IdQueue.put(worker_id)
-        print 'worker: ' + ip +':' + port + " Wants Work"
+        #print 'worker: ' + ip +':' + port + " Wants Work"
     return ""
 
 #recieve request
@@ -68,7 +71,7 @@ def dispatchLoop():
         #print workerIdToUrl
         time.sleep(1)
         if not workQueue.empty():
-            print 'work in'
+            info('work IN')
             work_id = workQueue.get()
             for i in range(3):
                 worker_id = worker_IdQueue.get()
@@ -96,10 +99,10 @@ def assignments():
         task = request.form 
         workid = uuid.uuid4()
         workToWorkPath[workid] = task
-        print workid
+        #print workid
         #task = {'msg':'working Now'}
         workQueue.put(workid, block=False)
-        print workQueue
+        #print workQueue
     return str(task)
 
 #recieve response
@@ -114,8 +117,8 @@ def response():
         url = 'http://' + ip +':' + port + '/sendwork'
         worker_id = UrlToWorkerId[url]
         work_id = workerIdToWorkId[worker_id]
-        resultIdToResults[work_id] = results
-        print str(resultIdToResults[work_id])
+        workerIdToResults[work_id] = results
+        print str(workerIdToResults[work_id])
     return ""
 
 if __name__ == '__main__':
@@ -131,7 +134,7 @@ if __name__ == '__main__':
     #status = {'id' : 'state'}
     UrlToWorkerId = manager.dict()
 
-    resultIdToResults = manager.dict()
+    workerIdToResults = manager.dict()
     #WorkId to results
     workIdToResults = manager.dict()
     # workId to workerList id's only infro from /register
