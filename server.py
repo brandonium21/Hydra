@@ -18,6 +18,7 @@ resRouter = 'http://' + host + ':5000/response'
 router = 'http://' + host + ':5000/register'
 moreWork = 'http://' + host + ':5000/moreWork'
 port = 0
+blah = {'port':sys.argv[1]}
 @app.route('/sendwork', methods= ['GET', 'POST'])
 def sendwork():
         if routerMsg(request.form):
@@ -55,10 +56,11 @@ def routerMsg(task):
     return True if 'task' in task else False
 
 def done():
-    m = requests.post(moreWork, data= port)
+    info(blah)
+    m = requests.post(moreWork, data= blah)
 # SERVER
 def state():
-    r = requests.post(router, data= port)
+    r = requests.post(router, data= blah)
 
 
 
@@ -66,6 +68,6 @@ if __name__ == '__main__':
     p = Process(target=workLoop)
     p.start()
     
-    port = {'port':sys.argv[1]}
+    blah = {'port':sys.argv[1]}
     state();
     app.run(host = host , port= int(sys.argv[1]))
