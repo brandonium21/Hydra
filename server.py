@@ -1,6 +1,7 @@
 import sys
 from logging import warning, info , error, debug, critical, DEBUG, basicConfig
-basicConfig(stream=sys.stdout, level=DEBUG)
+import time
+basicConfig(stream=sys.stdout, level=DEBUG,  format = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
 from flask import Flask
 from flask import redirect, render_template
 from flask import request, url_for
@@ -29,7 +30,7 @@ def sendwork():
         return "got it"
 
 def workLoop():
-    import time
+
     while True:
         time.sleep(.1)
         if not q.empty():

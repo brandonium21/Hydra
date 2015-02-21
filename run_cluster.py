@@ -19,7 +19,6 @@ def run_client(port):
 def run_server(port):
 	run('python ./server.py ' + str(port))
 if __name__ == '__main__':
-
 	port = 5002
 	run_router()
 	sleep(1)

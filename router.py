@@ -1,6 +1,7 @@
 import sys
 from logging import warning, info , error, debug, critical, DEBUG, basicConfig
-basicConfig(stream=sys.stdout, level=DEBUG)
+import time
+basicConfig(stream=sys.stdout, level=DEBUG,  format = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
 from flask import Flask, request
 import requests 
 import uuid
@@ -22,9 +23,7 @@ def ready():
         url = 'http://' + ip +':' + port + '/sendwork'
         
         worker_id = UrlToWorkerId[url]
-        #print 'got workerId '
         worker_IdQueue.put(worker_id)
-        #print 'worker: ' + ip +':' + port + " Wants Work"
     return ""
 
 #recieve request
@@ -43,7 +42,6 @@ def register():
         worker_IdQueue.put(worker_id) 
 
         # url to Newworkerid
-        #print str(workerIdToUrl)
     else:
         return "bad request"
 
@@ -68,14 +66,12 @@ def Id():
 def dispatchLoop():
     import time
     while True:
-        #print workerIdToUrl
         time.sleep(1)
         if not workQueue.empty():
             info('work IN')
             work_id = workQueue.get()
             for i in range(3):
                 worker_id = worker_IdQueue.get()
-                #print "got worker"
                 if work_id in workIdToWorkerList:
                     #if list is empty add initial worker
                     workIdToWorkerList[work_id] = workIdToWorkerList[work_id] + [worker_id, ]
@@ -84,7 +80,6 @@ def dispatchLoop():
                     # if list is populated add workers
                 
                 workerIdToWorkId[worker_id] = work_id
-                #print workerIdToUrl[worker_id]
 
                 r = requests.post(workerIdToUrl[worker_id] , data = workToWorkPath[work_id])
 
@@ -92,23 +87,15 @@ def dispatchLoop():
 # take in work and delegate work.
 @app.route('/work', methods= ['GET', 'POST'])
 def assignments():
-    print request.form
-    print 'task' in request.form
-    print verifyTask(request.form)
     if verifyTask(request.form):
         task = request.form 
         workid = uuid.uuid4()
         workToWorkPath[workid] = task
-        #print workid
-        #task = {'msg':'working Now'}
         workQueue.put(workid, block=False)
-        #print workQueue
     return str(task)
 
 #recieve response
 @app.route('/response', methods= ['GET', 'POST'])
-def response():
-    #print request.form
     worker = request.form 
     if verifyResults(worker):
         results = worker
@@ -118,7 +105,6 @@ def response():
         worker_id = UrlToWorkerId[url]
         work_id = workerIdToWorkId[worker_id]
         workerIdToResults[work_id] = results
-        print str(workerIdToResults[work_id])
     return ""
 
 if __name__ == '__main__':
